@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Generador de QR con Logo y Descarga pa Danny</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background: #f5f7fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      color: #333;
+      user-select: none;
+    }
+
+    h1 {
+      font-weight: 700;
+      color: #0d3b66;
+      margin-bottom: 1rem;
+      text-align: center;
+      text-shadow: 0 1px 3px rgba(13, 59, 102, 0.4);
+    }
+
+    #qrcode {
+      position: relative;
+      width: 280px;
+      height: 280px;
+      margin-top: 1.5rem;
+      box-shadow: 0 8px 20px rgba(13, 59, 102, 0.1);
+      border-radius: 15px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #qrcode canvas {
+      width: 256px !important;
+      height: 256px !important;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    #logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 70px;
+      height: 70px;
+      transform: translate(-50%, -50%);
+      border-radius: 15px;
+      background: white;
+      padding: 6px;
+      box-sizing: border-box;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      pointer-events: none;
+    }
+
+    input[type="text"] {
+      width: 320px;
+      padding: 0.65rem 1rem;
+      font-size: 1.1rem;
+      border: 2px solid #0d3b66;
+      border-radius: 12px;
+      outline-offset: 2px;
+      transition: border-color 0.3s ease;
+    }
+    input[type="text"]:focus {
+      border-color: #f95738;
+      box-shadow: 0 0 8px rgba(249, 87, 56, 0.4);
+    }
+
+    div.buttons {
+      margin-top: 1rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button {
+      padding: 0.65rem 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(135deg, #0d3b66 0%, #145374 100%);
+      box-shadow: 0 6px 12px rgba(13, 59, 102, 0.3);
+      transition: background 0.3s ease, transform 0.15s ease;
+      user-select: none;
+      min-width: 140px;
+    }
+    button:hover {
+      background: linear-gradient(135deg, #f95738 0%, #ff6e40 100%);
+      box-shadow: 0 8px 20px rgba(249, 87, 56, 0.5);
+      transform: translateY(-2px);
+    }
+    button:active {
+      transform: translateY(1px);
+      box-shadow: 0 4px 10px rgba(249, 87, 56, 0.4);
+    }
+
+    /* Responsive */
+    @media (max-width: 400px) {
+      input[type="text"] {
+        width: 90vw;
+      }
+      button {
+        width: 90vw;
+        min-width: auto;
+      }
+      #qrcode {
+        width: 90vw;
+        height: 90vw;
+      }
+      #qrcode canvas {
+        width: 90vw !important;
+        height: 90vw !important;
+      }
+      #logo {
+        width: 20vw;
+        height: 20vw;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Generador de Código QR con Logo y Descarga pa Danny</h1>
+
+  <input id="text" type="text" placeholder="Introduce el texto o URL para el QR" value="" />
+
+  <div class="buttons">
+    <button id="generate">Generar QR</button>
+    <button id="download">Descargar QR</button>
+  </div>
+
+  <div id="qrcode">
+    <canvas></canvas>
+    <img id="logo" src="/ALCASEG.jpg" alt="Logo ALCASEG" />
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script>
+    const generateBtn = document.getElementById('generate');
+    const downloadBtn = document.getElementById('download');
+    const qrContainer = document.getElementById('qrcode');
+    const inputText = document.getElementById('text');
+    const logo = document.getElementById('logo');
+    const canvas = qrContainer.querySelector('canvas');
+
+    function generateQR(text) {
+      QRCode.toCanvas(canvas, text, {
+        width: 256,
+        margin: 1,
+        color: {
+          dark: '#000000',
+          light: '#ffffff'
+        },
+        errorCorrectionLevel: 'H' // Alto para logo
+      }, function (error) {
+        if (error) console.error(error);
+      });
+    }
+
+    generateBtn.addEventListener('click', () => {
+      const text = inputText.value.trim();
+      if (text) {
+        generateQR(text);
+      } else {
+        alert("Por favor, introduce texto o URL para generar el QR.");
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      const combinedCanvas = document.createElement('canvas');
+      combinedCanvas.width = 256;
+      combinedCanvas.height = 256;
+      const ctx = combinedCanvas.getContext('2d');
+
+      ctx.drawImage(canvas, 0, 0, 256, 256);
+
+      const logoSize = 60;
+      const logoX = (combinedCanvas.width - logoSize) / 2;
+      const logoY = (combinedCanvas.height - logoSize) / 2;
+
+      if (logo.complete) {
+        ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+        triggerDownload();
+      } else {
+        logo.onload = () => {
+          ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
+          triggerDownload();
+        }
+      }
+
+      function triggerDownload() {
+        const link = document.createElement('a');
+        link.href = combinedCanvas.toDataURL('image/png');
+        link.download = 'qr-con-logo.png';
+        link.click();
+      }
+    });
+  </script>
+</body>
+</html>
